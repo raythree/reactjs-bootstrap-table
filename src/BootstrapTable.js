@@ -46,6 +46,10 @@ class BootstrapTable extends React.Component {
       }
     }
 
+    if (!this.props.columns) {
+      throw new Error('The required columns property is missing');
+    }
+
     this.state = {
       selected: {},
       selectAll: false,
@@ -53,6 +57,7 @@ class BootstrapTable extends React.Component {
       data: this.props.data || [],
       lastClicked: null,
       keyName: this.props.keyName || 'id',
+      columns: []
     };
 
     this.onChange = this.props.onChange || noop;
@@ -136,6 +141,7 @@ class BootstrapTable extends React.Component {
   //----------------------------------------------------------------------------
   render() {
     if (!(this.state.data.length)) {
+      // no data, child element used to display empty message
       return this.props.children;
     }
 
@@ -152,12 +158,15 @@ class BootstrapTable extends React.Component {
     }
 
     //log.debug('generating headers');
-    if (this.props.headers && this.props.headers.length) {
+    if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
-      this.props.headers.map((item) => {
+      this.props.columns.map((col) => {
+        let title = col.display || col.name;
+        let glyph = '';
+        if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
         items.push(
           <th key={ix++}>
-            {item} <Glyph icon="triangle-bottom"/>
+            {title} {glyph}
           </th>
         );
       });
@@ -200,17 +209,14 @@ class BootstrapTable extends React.Component {
         );
       }
 
-      Object.keys(item).forEach((prop) => {
+      this.props.columns.forEach((col) => {
+        let prop = col.name;
         let content = item[prop];
-        if (prop !== this.state.keyName) {
-          if (this.props.cellRenderers) {
-            if (this.props.cellRenderers[prop]) {
-              content = this.props.cellRenderers[prop](item);
-            }
-          }
-          let td = <td key={ix++}>{content}</td>
-          items.push(td);
+        if (col.renderer) {
+          content = col.renderer(item);
         }
+        let td = <td key={ix++}>{content}</td>
+        items.push(td);
       });
 
       //log.debug('=====> table row with key ' + k);
