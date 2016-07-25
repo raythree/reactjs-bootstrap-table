@@ -128,7 +128,7 @@ class BootstrapTable extends Component {
         lower = index;
         upper = this.state.anchor;
       }
-      else if (this.state.anchor < index) {
+      else if (this.state.anchor <= index) {
         lower = this.state.anchor;
         upper = index;
       }
