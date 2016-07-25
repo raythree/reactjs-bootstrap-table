@@ -1,17 +1,21 @@
-import React from 'react';
-import Logger from 'simple-console-logger'
+import React, { Component } from 'react';
+import Logger from 'simple-console-logger';
 
 const log = Logger.getLogger('BootstrapTable');
 
-const Glyph = React.createClass({
-  render: function () {
+class Glyph extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
     let style = this.props.style || {};
     let onClick = this.props.onClick || null;
     return (
       <span style={style} onClick={onClick} className={'glyphicon glyphicon-' + this.props.icon}> </span>
     );
   }
-});
+}
 
 function bindmethods(list, obj) {
   if (!list) return;
@@ -27,7 +31,7 @@ function noop() {}
 //----------------------------------------------------------------------------
 // A bootstrap table with single or multiple select.
 //----------------------------------------------------------------------------
-class BootstrapTable extends React.Component {
+class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
     let cnt = this.props.data ? this.props.data.length : 'zero';
@@ -51,7 +55,6 @@ class BootstrapTable extends React.Component {
     }
 
     this.state = {
-      selected: {},
       selectAll: false,
       select: select,
       data: this.props.data || [],
@@ -76,50 +79,55 @@ class BootstrapTable extends React.Component {
       return;
     }
 
-    // find the parent row marked with id = bst-<key>
+    // find the parent row marked with id = bst-<key>-<index>
     while (true) {
       rid = node.id;
-      if (rid && rid.startsWith('bst')) {
+      if (rid && rid.startsWith('bst-')) {
         break;
       }
       else {
         node = node.parentNode;
       }
     }
-    let key = rid.split('-')[1];
-    //log.debug('row clicked ====> ' + key);
+
+    const parts = rid.split('-')
+    const key = parts[1];
+    const index = parts[2];
+    log.debug('row clicked ====> ' + key + ' index = ' + index);
 
     if (this.props.select === 'multiple') {
-      this.multiSelect(key);
+      this.multiSelect(key, index);
     }
     else {
       this.singleSelect(key);
     }
-
-    this.onChange(Object.keys(this.state.selected));
   }
 
   singleSelect(key) {
-    let selected = this.state.selected;
-    if (selected[key]) {
-        delete selected[key];
+    let current = this.props.selected || {};
+    let selected = {};
+
+    if (current[key]) {
+      this.onChange({}); // already selected, deselect it
     }
     else {
-      selected = {};
       selected[key] = true;
+      this.onChange(selected);
     }
-    this.setState({selected});
   }
 
-  multiSelect(key) {
-    let selected = this.state.selected;
+  multiSelect(key, index) {
+    let current = this.props.selected || {};
+    let selected = Object.assign({}, current);
     if (selected[key]) {
       delete selected[key];
     }
     else {
       selected[key] = true;
     }
-    this.setState({selected: selected});
+
+    this.setState({lastClicked: index})
+    this.onChange(selected);
   }
 
   //----------------------------------------------------------------------------
@@ -129,23 +137,34 @@ class BootstrapTable extends React.Component {
     const all = !this.state.selectAll, selected = {};
 
     if (all) {
-      this.state.data.forEach(function (item) {
+      this.props.data.forEach(function (item) {
         selected[item[this.state.keyName]] = true;
       }.bind(this));
     }
-    this.setState( {selectAll: all, selected: selected} );
+    this.setState( {selectAll: all} );
+    this.onChange(selected);
   }
 
   //----------------------------------------------------------------------------
   // Lifecycle
   //----------------------------------------------------------------------------
+
+  componentWillReceiveProps(newProps, oldProps) {
+    log.debug('will receive props');
+
+    //let selected = getSelection(newProps);
+    //this.setState({selected: selected});
+  }
+
   render() {
-    if (!(this.state.data.length)) {
+    if (!(this.props.data.length)) {
       // no data, child element used to display empty message
       return this.props.children;
     }
 
     let headers = <thead/>, body = '', items = [], rows, selectAll = 'unchecked';
+    let selected = this.props.selected || {};
+
     if (this.state.selectAll) selectAll = 'check';
 
     // add select all header only for multiple selection
@@ -182,7 +201,9 @@ class BootstrapTable extends React.Component {
     //
     // Table rows bound to this to handle row clicks
     //
+    let index = -1;
     rows = this.props.data.map(function (item) {
+      ++index;
       let rowId, row, icon = 'unchecked', clz = '', items = '';
 
       let missingKey = 'Data item missing key. If the default "id" key is not used set the keyName property.';
@@ -191,10 +212,10 @@ class BootstrapTable extends React.Component {
 
       // Used to identify the row element that was clicked. If a child is clicked, navigate up each
       // parentNode until a 'bst-' row ID is found.
-      rowId = 'bst-' + k;
+      rowId = 'bst-' + k + '-' + index;
 
       // change styles if current row is selected
-      if (this.state.selected[k]) {
+      if (selected[k]) {
         icon = 'check';
         clz = this.props.activeClass || 'active';
       }
@@ -224,8 +245,8 @@ class BootstrapTable extends React.Component {
       if (this.state.select === 'single' || this.state.select === 'multiple') {
         cursor = {cursor: 'pointer'};
       }
-      row = <tr id={rowId} key={k} style={cursor} className={clz} onClick={this.rowClicked}>
-        { items }
+      row = <tr id={rowId} key={index} style={cursor} className={clz} onClick={this.rowClicked}>
+        {items}
       </tr>
 
       return row;
@@ -235,9 +256,9 @@ class BootstrapTable extends React.Component {
     let style = this.props.style || {};
     let table =
       <table style={style}className="table table-hover table-bordered">
-        { headers }
+        {headers}
         <tbody>
-          { rows }
+          {rows}
         </tbody>
       </table>
 
