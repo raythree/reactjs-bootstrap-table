@@ -36,14 +36,17 @@ class BootstrapTable extends Component {
     super(props, context);
     let cnt = this.props.data ? this.props.data.length : 'zero';
     //log.debug('constructed with ' + cnt + ' items');
-    bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect'], this);
+    bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect', 'getColWidth'], this);
 
-    let select = 'none';
+    this.keyName = this.props.keyName || 'id';
+    this.onChange = this.props.onChange || noop;
+
+    this.select = 'none';
     if (this.props.select) {
       if (this.props.select === 'single' ||
           this.props.select === 'multiple' ||
           this.props.select === 'none') {
-        select = this.props.select;
+        this.select = this.props.select;
       }
       else {
         throw new Error('select property must be single, multiple, or none');
@@ -53,29 +56,30 @@ class BootstrapTable extends Component {
     if (!this.props.columns) {
       throw new Error('The required columns property is missing');
     }
+    if (typeof this.props.columns.length === 'undefined') {
+      throw new Error('The columns property must be an array');
+    }
 
     this.state = {
       selectAll: false,
-      select: select,
-      data: this.props.data || [],
-      anchor: null,
-      keyName: this.props.keyName || 'id',
-      columns: []
+      anchor: null
     };
-
-    this.onChange = this.props.onChange || noop;
   }
 
   //----------------------------------------------------------------------------
   // Row clicked, update selection state
   //----------------------------------------------------------------------------
+  getColWidth() {
+
+  }
+
   rowClicked(e) {
     let node = e.target, rid;
     // ignore clicks if the clicked on element is marked as no-select
     if (node.className && node.className.indexOf('bst-no-select') > -1) {
       return;
     }
-    if (this.state.select === 'none') {
+    if (this.select === 'none') {
       return;
     }
 
@@ -143,7 +147,7 @@ class BootstrapTable extends Component {
         );
         for (let i = lower; i <= upper; i++) {
           let item = data[i];
-          selected[item[this.state.keyName]] = true;
+          selected[item[this.keyName]] = true;
         }
       }
     }
@@ -165,10 +169,11 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
   toggleSelectAll() {
     const all = !this.state.selectAll, selected = {};
+    const data = this.props.data || [];
 
     if (all) {
-      this.props.data.forEach(function (item) {
-        selected[item[this.state.keyName]] = true;
+      data.forEach(function (item) {
+        selected[item[this.keyName]] = true;
       }.bind(this));
     }
     this.setState( {selectAll: all} );
@@ -187,7 +192,7 @@ class BootstrapTable extends Component {
   }
 
   render() {
-    if (!(this.props.data.length)) {
+    if (!(this.props.data && this.props.data.length)) {
       // no data, child element used to display empty message
       return this.props.children;
     }
@@ -198,7 +203,7 @@ class BootstrapTable extends Component {
     if (this.state.selectAll) selectAll = 'check';
 
     // add select all header only for multiple selection
-    if (this.state.select === 'multiple') {
+    if (this.select === 'multiple') {
       items.push(
         <th key="check" style={{width: '1em'}}>
           <Glyph onClick={this.toggleSelectAll} icon={selectAll}/>
@@ -214,14 +219,14 @@ class BootstrapTable extends Component {
         let glyph = '';
         if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
         items.push(
-          <th key={ix++}>
+          <th key={ix++} style={{width: '33%'}}>
             {title} {glyph}
           </th>
         );
       });
 
       headers =
-        <thead>
+        <thead style={{display: 'block'}}>
           <tr>
             { items }
           </tr>
@@ -231,13 +236,13 @@ class BootstrapTable extends Component {
     //
     // Table rows bound to this to handle row clicks
     //
-    let index = -1;
-    rows = this.props.data.map(function (item) {
+    let index = -1, data = this.props.data || [];
+    rows = data.map(function (item) {
       ++index;
       let rowId, row, icon = 'unchecked', clz = '', items = '';
 
       let missingKey = 'Data item missing key. If the default "id" key is not used set the keyName property.';
-      let k = item[this.state.keyName];
+      let k = item[this.keyName];
       if (!k) throw new Error(missingKey);
 
       // Used to identify the row element that was clicked. If a child is clicked, navigate up each
@@ -254,7 +259,7 @@ class BootstrapTable extends Component {
       let ix = 1;
 
       // add select all header only for multiple selection
-      if (this.state.select === 'multiple') {
+      if (this.select === 'multiple') {
         items.push(
           <td key="check" style={{width: '1em'}}><Glyph icon={icon} /></td>
         );
@@ -266,13 +271,13 @@ class BootstrapTable extends Component {
         if (col.renderer) {
           content = col.renderer(item);
         }
-        let td = <td key={ix++}>{content}</td>
+        let td = <td key={ix++} style={{width: '33%'}}>{content}</td>
         items.push(td);
       });
 
       //log.debug('=====> table row with key ' + k);
       let cursor = {};
-      if (this.state.select === 'single' || this.state.select === 'multiple') {
+      if (this.select === 'single' || this.select === 'multiple') {
         cursor = {cursor: 'pointer'};
       }
       row = <tr id={rowId} key={index} style={cursor} className={clz} onClick={this.rowClicked}>
@@ -287,7 +292,7 @@ class BootstrapTable extends Component {
     let table =
       <table style={style}className="table table-hover table-bordered">
         {headers}
-        <tbody>
+        <tbody style={{height: '100%', width: '100%', overflow: 'auto', display: 'block'}}>
           {rows}
         </tbody>
       </table>
