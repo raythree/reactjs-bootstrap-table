@@ -229,14 +229,10 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
 
   componentDidMount() {
-    $('body').attr('unselectable', 'on');
   }
 
   componentWillReceiveProps(newProps, oldProps) {
     log.debug('will receive props');
-
-    //let selected = getSelection(newProps);
-    //this.setState({selected: selected});
   }
 
   render() {
