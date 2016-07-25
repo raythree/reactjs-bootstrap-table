@@ -58,7 +58,7 @@ class BootstrapTable extends Component {
       selectAll: false,
       select: select,
       data: this.props.data || [],
-      lastClicked: null,
+      anchor: null,
       keyName: this.props.keyName || 'id',
       columns: []
     };
@@ -92,11 +92,11 @@ class BootstrapTable extends Component {
 
     const parts = rid.split('-')
     const key = parts[1];
-    const index = parts[2];
-    log.debug('row clicked ====> ' + key + ' index = ' + index);
+    const index = parseInt(parts[2]);
+    log.debug('row clicked ====> ' + key + ' index = ' + index + ' shift ' + e.shiftKey);
 
     if (this.props.select === 'multiple') {
-      this.multiSelect(key, index);
+      this.multiSelect(key, index, e.shiftKey);
     }
     else {
       this.singleSelect(key);
@@ -116,17 +116,47 @@ class BootstrapTable extends Component {
     }
   }
 
-  multiSelect(key, index) {
+  multiSelect(key, index, shiftKey) {
+    log.debug('processing multiselect');
     let current = this.props.selected || {};
+    let data = this.props.data || [];
     let selected = Object.assign({}, current);
-    if (selected[key]) {
-      delete selected[key];
+
+    if (shiftKey && this.state.anchor !== null) {
+      let upper = null, lower = null;
+      if (this.state.anchor > index) {
+        lower = index;
+        upper = this.state.anchor;
+      }
+      else if (this.state.anchor < index) {
+        lower = this.state.anchor;
+        upper = index;
+      }
+      else {
+        this.setState({anchor: index});
+        selected[key] = true;
+      }
+      if (lower !== null) {
+        selected = {};
+        log.debug('SELECT: anchor: ' + this.state.anchor +
+          ' lower: ' + lower + ' upper: ' + upper
+        );
+        for (let i = lower; i <= upper; i++) {
+          let item = data[i];
+          selected[item[this.state.keyName]] = true;
+        }
+      }
     }
     else {
-      selected[key] = true;
+      if (selected[key]) {
+        delete selected[key];
+      }
+      else {
+        selected[key] = true;
+      }
+      this.setState({anchor: index})
     }
 
-    this.setState({lastClicked: index})
     this.onChange(selected);
   }
 
