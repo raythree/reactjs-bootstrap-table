@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Logger from 'simple-console-logger';
+import $ from 'jquery';
 
 const log = Logger.getLogger('BootstrapTable');
 
@@ -36,7 +37,8 @@ class BootstrapTable extends Component {
     super(props, context);
     let cnt = this.props.data ? this.props.data.length : 'zero';
     //log.debug('constructed with ' + cnt + ' items');
-    bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect', 'getColWidth'], this);
+    bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect',
+                 'setColumnWidth', 'getColWidth'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
@@ -60,6 +62,8 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
+    this.setColumnWidths();
+
     this.state = {
       selectAll: false,
       anchor: null
@@ -67,12 +71,52 @@ class BootstrapTable extends Component {
   }
 
   //----------------------------------------------------------------------------
-  // Row clicked, update selection state
+  // Adjust column width
   //----------------------------------------------------------------------------
-  getColWidth() {
+  setColumnWidths() {
+    let remainder = 100;
+    let unspecified = this.props.columns.length;
+    let columnWidths = {};
 
+    this.props.columns.forEach(col => {
+      if (typeof col.width !== 'undefined') {
+        if (typeof col.width !== 'number') {
+          throw new Error('column width property must be a percent number');
+        }
+        if (col.width < 0 || col.width > 100) {
+          throw new Error('column width must be between 0 and 100')
+        }
+        --unspecified;
+        remainder = remainder - col.width;
+        columnWidths[col.name] = col.width;
+      }
+    });
+    if (remainder < 0) {
+      throw new Error('total column widths may not exceed 100 percent');
+    }
+    if (remainder > 0 && unspecified) {
+      let amount = remainder / unspecified;
+      this.props.columns.forEach(col => {
+        if (typeof col.width === 'undefined') {
+          columnWidths[col.name] = amount;
+        }
+      });
+    }
+    Object.keys(columnWidths).forEach(name => {
+      log.debug('column name: ' + name + ' width: ' + columnWidths[name].width);
+    });
+
+    this.columnWidths = columnWidths;
   }
 
+  getColWidth(name) {
+    let percent = this.columnWidths[name];
+    return '' + percent + '%';
+  }
+
+  //----------------------------------------------------------------------------
+  // Row clicked, update selection state
+  //----------------------------------------------------------------------------
   rowClicked(e) {
     let node = e.target, rid;
     // ignore clicks if the clicked on element is marked as no-select
@@ -184,6 +228,10 @@ class BootstrapTable extends Component {
   // Lifecycle
   //----------------------------------------------------------------------------
 
+  componentDidMount() {
+    $('body').attr('unselectable', 'on');
+  }
+
   componentWillReceiveProps(newProps, oldProps) {
     log.debug('will receive props');
 
@@ -219,7 +267,7 @@ class BootstrapTable extends Component {
         let glyph = '';
         if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
         items.push(
-          <th key={ix++} style={{width: '33%'}}>
+          <th key={ix++} style={{width: this.getColWidth(col.name)}}>
             {title} {glyph}
           </th>
         );
@@ -271,7 +319,7 @@ class BootstrapTable extends Component {
         if (col.renderer) {
           content = col.renderer(item);
         }
-        let td = <td key={ix++} style={{width: '33%'}}>{content}</td>
+        let td = <td key={ix++} style={{width: this.getColWidth(col.name)}}>{content}</td>
         items.push(td);
       });
 
@@ -288,15 +336,17 @@ class BootstrapTable extends Component {
 
     }.bind(this));
 
+    let bodyHeight = this.props.bodyHeight || '100%';
     let style = this.props.style || {};
     let table =
-      <table style={style}className="table table-hover table-bordered">
-        {headers}
-        <tbody style={{height: '100%', width: '100%', overflow: 'auto', display: 'block'}}>
-          {rows}
-        </tbody>
-      </table>
-
+      <div style={{msUserSelect: 'none'}}>
+        <table style={style}className="table table-hover table-bordered">
+          {headers}
+          <tbody style={{height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'}}>
+            {rows}
+          </tbody>
+        </table>
+      </div>
     return table;
   }
 }
