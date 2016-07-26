@@ -3,8 +3,9 @@ import Logger from 'simple-console-logger';
 import Glyph from './Glyph'
 import { bindmethods, getColumnWidths } from './util';
 import Resizer from './Resizer';
-import $ from 'jquery';
+import Selection from './Selection';
 
+Logger.configure({level: 'debug', 'dateFormat': null});
 const log = Logger.getLogger('BootstrapTable');
 
 function noop() {}
@@ -21,6 +22,9 @@ class BootstrapTable extends Component {
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
     this.id = this.props.id || 'bst-table1';
+    this.headerId = this.id + '-header';
+
+    this.selection = new Selection(this);
 
     this.select = 'none';
     if (this.props.select) {
@@ -41,18 +45,6 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
-    if (this.props.resize && this.props.resize.leave) {
-      if (typeof this.props.resize.leave === 'number') {
-        log.debug('resize: leave pixels: ' + this.props.resize.leave);
-        this.extraSpace = this.props.resize.leave;
-        this.resizer = new Resizer(this);
-      }
-      else if (this.props.resize.leave.length) {
-        log.debug('resize: leave array length: ' + this.props.resize.leave.length);
-      }
-      else throw new Error('resize property must be a number or array of strings');
-    }
-
     this.columnWidths = getColumnWidths(this.props.columns);
 
     this.state = {
@@ -66,99 +58,12 @@ class BootstrapTable extends Component {
   // Row clicked, update selection state
   //----------------------------------------------------------------------------
   rowClicked(e) {
-    let node = e.target, rid;
-    // ignore clicks if the clicked on element is marked as no-select
-    if (node.className && node.className.indexOf('bst-no-select') > -1) {
-      return;
-    }
-    if (this.select === 'none') {
-      return;
-    }
-
-    // find the parent row marked with id = bst-<key>-<index>
-    while (true) {
-      rid = node.id;
-      if (rid && rid.startsWith('bst-')) {
-        break;
-      }
-      else {
-        node = node.parentNode;
-      }
-    }
-
-    const parts = rid.split('-')
-    const key = parts[1];
-    const index = parseInt(parts[2]);
-    log.debug('row clicked ====> ' + key + ' index = ' + index + ' shift ' + e.shiftKey);
-
-    if (this.props.select === 'multiple') {
-      this.multiSelect(key, index, e.shiftKey);
-    }
-    else {
-      this.singleSelect(key);
-    }
+    this.selection.rowClicked(e);
   }
 
   getColWidth(name) {
     let percent = this.columnWidths[name];
     return '' + percent + '%';
-  }
-
-  singleSelect(key) {
-    let current = this.props.selected || {};
-    let selected = {};
-
-    if (current[key]) {
-      this.onChange({}); // already selected, deselect it
-    }
-    else {
-      selected[key] = true;
-      this.onChange(selected);
-    }
-  }
-
-  multiSelect(key, index, shiftKey) {
-    log.debug('processing multiselect');
-    let current = this.props.selected || {};
-    let data = this.props.data || [];
-    let selected = Object.assign({}, current);
-
-    if (shiftKey && this.state.anchor !== null) {
-      let upper = null, lower = null;
-      if (this.state.anchor > index) {
-        lower = index;
-        upper = this.state.anchor;
-      }
-      else if (this.state.anchor <= index) {
-        lower = this.state.anchor;
-        upper = index;
-      }
-      else {
-        this.setState({anchor: index});
-        selected[key] = true;
-      }
-      if (lower !== null) {
-        selected = {};
-        log.debug('SELECT: anchor: ' + this.state.anchor +
-          ' lower: ' + lower + ' upper: ' + upper
-        );
-        for (let i = lower; i <= upper; i++) {
-          let item = data[i];
-          selected[item[this.keyName]] = true;
-        }
-      }
-    }
-    else {
-      if (selected[key]) {
-        delete selected[key];
-      }
-      else {
-        selected[key] = true;
-      }
-      this.setState({anchor: index})
-    }
-
-    this.onChange(selected);
   }
 
   //----------------------------------------------------------------------------
@@ -182,11 +87,10 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
 
   componentDidMount() {
-    let cw = document.documentElement.clientHeight;
-    let th = document.getElementById(this.id).offsetHeight;
-
-    log.debug('mounted: client height = ' + cw + ' table height = ' + th);
-    if (this.resizer) this.resizer.addHandler();
+    if (this.props.resize) {
+      this.resizer = new Resizer(this, this.props.resize);
+      this.resizer.addHandler();
+    }
   }
 
   componentWillUnmount() {
@@ -228,7 +132,7 @@ class BootstrapTable extends Component {
       });
 
       headers =
-        <thead style={{display: 'block'}}>
+        <thead style={{display: 'block'}} id={this.headerId}>
           <tr style={{width: '100%'}}>
             { items }
           </tr>
@@ -291,6 +195,7 @@ class BootstrapTable extends Component {
     }.bind(this));
 
     let bodyHeight = this.state.bodyHeight || '100%';
+    console.log('bodyHeight set to: ' + bodyHeight);
 
     let style = this.props.style || {};
     if (this.props.disableSelectText) {
