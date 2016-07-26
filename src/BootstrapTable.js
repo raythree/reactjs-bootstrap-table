@@ -1,31 +1,11 @@
 import React, { Component } from 'react';
 import Logger from 'simple-console-logger';
+import Glyph from './Glyph'
+import { bindmethods, getColumnWidths } from './util';
+import Resizer from './Resizer';
 import $ from 'jquery';
 
 const log = Logger.getLogger('BootstrapTable');
-
-class Glyph extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    let style = this.props.style || {};
-    let onClick = this.props.onClick || null;
-    return (
-      <span style={style} onClick={onClick} className={'glyphicon glyphicon-' + this.props.icon}> </span>
-    );
-  }
-}
-
-function bindmethods(list, obj) {
-  if (!list) return;
-  list.forEach((name) => {
-    if (typeof obj[name] === 'function') {
-      obj[name] = obj[name].bind(obj);
-    }
-  });
-}
 
 function noop() {}
 
@@ -35,13 +15,12 @@ function noop() {}
 class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
-    let cnt = this.props.data ? this.props.data.length : 'zero';
-    //log.debug('constructed with ' + cnt + ' items');
     bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect',
                  'setColumnWidth', 'getColWidth'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
+    this.id = this.props.id || 'bst-table1';
 
     this.select = 'none';
     if (this.props.select) {
@@ -62,56 +41,25 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
-    this.setColumnWidths();
+    this.resizer = new Resizer(this);
+
+    if (this.props.resize && this.props.resize.leave) {
+      if (typeof this.props.resize.leave === 'number') {
+        log.debug('resize: leave pixels: ' + this.props.resize.leave);
+      }
+      else if (this.props.resize.leave.length) {
+        log.debug('resize: leave array length: ' + this.props.resize.leave.length);
+      }
+      else throw new Error('resize property must be a number or array of strings');
+    }
+
+    this.columnWidths = getColumnWidths(this.props.columns);
 
     this.state = {
       selectAll: false,
+      bodyHeight: this.props.bodyHeight || '100%',
       anchor: null
     };
-  }
-
-  //----------------------------------------------------------------------------
-  // Adjust column width
-  //----------------------------------------------------------------------------
-  setColumnWidths() {
-    let remainder = 100;
-    let unspecified = this.props.columns.length;
-    let columnWidths = {};
-
-    this.props.columns.forEach(col => {
-      if (typeof col.width !== 'undefined') {
-        if (typeof col.width !== 'number') {
-          throw new Error('column width property must be a percent number');
-        }
-        if (col.width < 0 || col.width > 100) {
-          throw new Error('column width must be between 0 and 100')
-        }
-        --unspecified;
-        remainder = remainder - col.width;
-        columnWidths[col.name] = col.width;
-      }
-    });
-    if (remainder < 0) {
-      throw new Error('total column widths may not exceed 100 percent');
-    }
-    if (remainder > 0 && unspecified) {
-      let amount = remainder / unspecified;
-      this.props.columns.forEach(col => {
-        if (typeof col.width === 'undefined') {
-          columnWidths[col.name] = amount;
-        }
-      });
-    }
-    Object.keys(columnWidths).forEach(name => {
-      log.debug('column name: ' + name + ' width: ' + columnWidths[name].width);
-    });
-
-    this.columnWidths = columnWidths;
-  }
-
-  getColWidth(name) {
-    let percent = this.columnWidths[name];
-    return '' + percent + '%';
   }
 
   //----------------------------------------------------------------------------
@@ -149,6 +97,11 @@ class BootstrapTable extends Component {
     else {
       this.singleSelect(key);
     }
+  }
+
+  getColWidth(name) {
+    let percent = this.columnWidths[name];
+    return '' + percent + '%';
   }
 
   singleSelect(key) {
@@ -229,10 +182,15 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
 
   componentDidMount() {
+    let cw = document.documentElement.clientHeight;
+    let th = document.getElementById(this.id).offsetHeight;
+
+    log.debug('mounted: client height = ' + cw + ' table height = ' + th);
+    this.resizer.addHandler();
   }
 
-  componentWillReceiveProps(newProps, oldProps) {
-    log.debug('will receive props');
+  componentWillUnmount() {
+    this.resizer.removeHandler();
   }
 
   render() {
@@ -332,17 +290,16 @@ class BootstrapTable extends Component {
 
     }.bind(this));
 
-    let bodyHeight = this.props.bodyHeight || '100%';
+    let bodyHeight = this.state.bodyHeight || '100%';
+
     let style = this.props.style || {};
     let table =
-      <div style={{msUserSelect: 'none'}}>
-        <table style={style}className="table table-hover table-bordered">
-          {headers}
-          <tbody style={{height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'}}>
-            {rows}
-          </tbody>
-        </table>
-      </div>
+      <table style={style}className="table table-hover table-bordered" id={this.id}>
+        {headers}
+        <tbody style={{height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'}}>
+          {rows}
+        </tbody>
+      </table>
     return table;
   }
 }
