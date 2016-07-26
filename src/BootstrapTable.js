@@ -46,6 +46,7 @@ class BootstrapTable extends Component {
     if (this.props.resize && this.props.resize.leave) {
       if (typeof this.props.resize.leave === 'number') {
         log.debug('resize: leave pixels: ' + this.props.resize.leave);
+        this.extraSpace = this.props.resize.leave;
       }
       else if (this.props.resize.leave.length) {
         log.debug('resize: leave array length: ' + this.props.resize.leave.length);

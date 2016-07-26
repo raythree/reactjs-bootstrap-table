@@ -7,14 +7,19 @@ module.exports = function (tableComponent) {
     if (!table) return;
 
     let th = table.offsetHeight;
+    if (tableComponent.extraSpace) {
+      th = h - tableComponent.extraSpace;
+      console.log('new table height: ' + th);
+    }
     console.log('window resize height: ' + h + ' table height ' + th);
     //table.style.height = '' + h + 'px';
-    tableComponent.setState({bodyHeight: '' + h + 'px'});
+    tableComponent.setState({bodyHeight: '' + th + 'px'});
   }
 
   this.addHandler = function () {
     window.addEventListener('resize', resize);
     console.log('resize handler added');
+    resize();
   };
 
   this.removeHandler = function() {
