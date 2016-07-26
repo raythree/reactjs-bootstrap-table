@@ -100,7 +100,7 @@ class BootstrapTable extends Component {
   render() {
     if (!(this.props.data && this.props.data.length)) {
       // no data, child element used to display empty message
-      return this.props.children;
+      return this.props.children || <span/>;
     }
 
     let headers = <thead/>, body = '', items = [], rows, selectAll = 'unchecked';
@@ -149,7 +149,11 @@ class BootstrapTable extends Component {
 
       let missingKey = 'Data item missing key. If the default "id" key is not used set the keyName property.';
       let k = item[this.keyName];
-      if (!k) throw new Error(missingKey);
+      if (!k) {
+        if (this.selection.getType() != 'none') {
+          throw new Error(missingKey);
+        }    
+      }
 
       // Used to identify the row element that was clicked. If a child is clicked, navigate up each
       // parentNode until a 'bst-' row ID is found.

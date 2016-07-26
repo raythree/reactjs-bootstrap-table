@@ -17,6 +17,10 @@ module.exports = function (tableComponent) {
       throw new Error('bootstrap table: select must be single, multiple or none');
     }
 
+    this.getType = function () {
+      return type;
+    };
+
     this.rowClicked = function (e) {
       let node = e.target, rid;
       // ignore clicks if the clicked on element is marked as no-select
