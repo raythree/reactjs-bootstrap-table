@@ -229,7 +229,7 @@ class BootstrapTable extends Component {
 
       headers =
         <thead style={{display: 'block'}}>
-          <tr>
+          <tr style={{width: '100%'}}>
             { items }
           </tr>
         </thead>
@@ -282,7 +282,7 @@ class BootstrapTable extends Component {
       if (this.select === 'single' || this.select === 'multiple') {
         cursor = {cursor: 'pointer'};
       }
-      row = <tr id={rowId} key={index} style={cursor} className={clz} onClick={this.rowClicked}>
+      row = <tr style={{width: '100%'}} id={rowId} key={index} style={cursor} className={clz} onClick={this.rowClicked}>
         {items}
       </tr>
 
@@ -293,6 +293,9 @@ class BootstrapTable extends Component {
     let bodyHeight = this.state.bodyHeight || '100%';
 
     let style = this.props.style || {};
+    if (this.props.disableSelectText) {
+      ['WebkitUserSelect', 'MozUserSelect', 'msUserSelect'].forEach(key => { style[key] = 'none'; });
+    }
     let table =
       <table style={style}className="table table-hover table-bordered" id={this.id}>
         {headers}
