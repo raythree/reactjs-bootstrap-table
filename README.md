@@ -92,11 +92,15 @@ TableContainer extends React.Component {
     // set inital selection to empty
     this.setState({selection: {}, data: getData()});
 
-    bindmethods(['onChange', 'onDelete'], this);
+    bindmethods(['onChange', 'onDelete', 'deselectAll'], this);
   }
 
   onChange(newSelection) {
     this.setState(newSelection)
+  }
+
+  deselectAll() {
+    this.setState({}})
   }
 
   onDelete() {
@@ -110,6 +114,7 @@ TableContainer extends React.Component {
     return (
       <div>
         <button onClick={this.onDelete}>Delete Selected</button>
+        <button onClick={this.onDeselectAll}>Deselected All</button>
         <BootstrapTable selected={this.state.selected} data={this.state.data}/>
       </div>
     );  
@@ -130,3 +135,19 @@ if (this.props.disableSelectText) {
   ['WebkitUserSelect', 'MozUserSelect', 'msUserSelect'].forEach(key => { style[key] = 'none'; });
 }
 ```
+### Custom cell renderers
+You can specify a renderer inside a column to handle custom rendering. The function needs to return a react component. Note that when selection is enabled, clicking on child elements will by default change the row's selction state. If you do not want this to happen, add the className "bst-no-select" to the element. For example, to place a clickable link in one of the cells such that clicking the link does not alter the current selection state:
+
+```
+let columns = [
+  { name: item1, renderer: myRenderer},
+  { name: lastName },
+  { name: address }
+]
+
+function mRenderer(row) {
+  return <a href={row.link} className="bst-no-select">{row.title}</a>
+}
+
+```
+Note that the renderer is passed the entire record (row), not just the data for that column.
