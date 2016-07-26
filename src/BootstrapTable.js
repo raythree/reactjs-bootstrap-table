@@ -41,12 +41,11 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
-    this.resizer = new Resizer(this);
-
     if (this.props.resize && this.props.resize.leave) {
       if (typeof this.props.resize.leave === 'number') {
         log.debug('resize: leave pixels: ' + this.props.resize.leave);
         this.extraSpace = this.props.resize.leave;
+        this.resizer = new Resizer(this);
       }
       else if (this.props.resize.leave.length) {
         log.debug('resize: leave array length: ' + this.props.resize.leave.length);
@@ -187,11 +186,11 @@ class BootstrapTable extends Component {
     let th = document.getElementById(this.id).offsetHeight;
 
     log.debug('mounted: client height = ' + cw + ' table height = ' + th);
-    this.resizer.addHandler();
+    if (this.resizer) this.resizer.addHandler();
   }
 
   componentWillUnmount() {
-    this.resizer.removeHandler();
+    if (this.resizer) this.resizer.removeHandler();
   }
 
   render() {
