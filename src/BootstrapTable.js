@@ -161,6 +161,8 @@ class BootstrapTable extends Component {
       this.resizer = new Resizer(this, this.props.resize);
       this.resizer.addHandler();
     }
+    else {
+    }
   }
 
   componentWillUnmount() {
@@ -186,6 +188,11 @@ class BootstrapTable extends Component {
         </th>
       );
     }
+    else {
+      items.push(
+        <th key="check" style={{width: 0, padding: 0, borderColor: 'transparent'}} />
+      );
+    }
 
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
@@ -204,7 +211,7 @@ class BootstrapTable extends Component {
       }.bind(this));
 
       headers =
-        <thead style={{display: 'block'}} id={this.headerId}>
+        <thead id={this.headerId} style={{display: 'block'}}>
           <tr style={{width: '100%', cursor: 'pointer'}}>
             { items }
           </tr>
@@ -246,6 +253,11 @@ class BootstrapTable extends Component {
           <td key="check" style={{width: '1em'}}><Glyph icon={icon} /></td>
         );
       }
+      else {
+        items.push(
+          <td key="check" style={{width: 0, padding: 0, borderColor: 'transparent'}} />
+        );
+      }
 
       this.props.columns.forEach((col) => {
         let prop = col.name;
@@ -262,7 +274,7 @@ class BootstrapTable extends Component {
         cursor = {cursor: 'pointer'};
       }
       row =
-        <tr style={{width: '100%'}} id={rowId} key={index} style={cursor} className={clz}
+        <tr style={{width: '100%', display: 'block'}} id={rowId} key={index} style={cursor} className={clz}
             onClick={this.rowClicked} onDoubleClick={this.rowDoubleClicked}>
         {items}
       </tr>

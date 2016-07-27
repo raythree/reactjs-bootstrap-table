@@ -36,7 +36,9 @@ module.exports = function (tableComponent, resizeObj) {
   function resize() {
     let h = window.innerHeight;
     let table = document.getElementById(tableComponent.id);
-    if (!table) return;
+    if (!table) {
+      return;
+    }
 
     let th = table.offsetHeight;
     if (extra) {
