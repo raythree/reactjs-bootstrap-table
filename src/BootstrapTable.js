@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import Logger from 'simple-console-logger';
 import Glyph from './Glyph'
 import { bindmethods, getColumnWidths } from './util';
 import Resizer from './Resizer';
 import Selection from './Selection';
 import ColumnSort from './ColumnSort';
-
-Logger.configure({level: 'debug', 'dateFormat': null});
-const log = Logger.getLogger('BootstrapTable');
 
 function noop() {}
 
@@ -64,7 +60,7 @@ class BootstrapTable extends Component {
     this.selection.rowClicked(e);
     if (this.state.selectAll) {
       this.setState({selectAll: false});
-    }  
+    }
   }
 
   colClicked(e) {
@@ -81,8 +77,6 @@ class BootstrapTable extends Component {
     }
     const parts = rid.split('-')
     const key = parts[2];
-
-    log.debug('onColClick ' + key)
 
     // If the column is sortable, this changes the state internally of
     // the columnSort so force an update.
@@ -147,7 +141,6 @@ class BootstrapTable extends Component {
       );
     }
 
-    //log.debug('generating headers');
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
       this.props.columns.map(function(col) {
@@ -218,7 +211,6 @@ class BootstrapTable extends Component {
         items.push(td);
       });
 
-      //log.debug('=====> table row with key ' + k);
       let cursor = {};
       if (this.select === 'single' || this.select === 'multiple') {
         cursor = {cursor: 'pointer'};
@@ -232,7 +224,6 @@ class BootstrapTable extends Component {
     }.bind(this));
 
     let bodyHeight = this.state.bodyHeight || '100%';
-    console.log('bodyHeight set to: ' + bodyHeight);
 
     let style = this.props.style || {};
     if (this.props.disableSelectText) {
