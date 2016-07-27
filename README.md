@@ -1,6 +1,7 @@
 # reactjs-bootstrap-table
 
-A React table component using Bootstrap. Supports single or multi-select, column sorting, and dynamic resizing.
+A React table component using Bootstrap. Supports single or multi-select, column sorting, and dynamic resizing. Features like pagination, local or remote data sorting, etc. can easily be added externally.
+
 
 **NOTE:** This requires Bootstrap (and Glyphicons) to be loaded. For example, if using Webpack:
 
@@ -44,6 +45,16 @@ let columns = [
 
 <BootstrapTable columns={columns} data={data} headers={true} />
 ```
+
+### Column properties
+
+These are the properties for objects in the columns array:
+
+* ```name``` (required) - Property name of the field to display.
+* ```display``` (optional) - Name to display in the column header (if table headers property set to true). Defaults to ```name```.
+* ```sort``` (optional) - Set to true if the column is sortable (default false).
+* ```renderer``` (optional) - Function that takes the entire row as a parameter and returns a React component to be displayed in the column. Default displays content of row[name].
+* ```width``` (optional) - A percent integer for the column width. All columns without width are equally spaced with remaining percentage after summing columns specifying a width.
 
 ### Table body height
 By default all rows will be shown. If you want the table body to be a fixed size with the rows scrolling (auto), include the ```bodyHeight``` property:
@@ -171,4 +182,14 @@ onSort(colName, dir) {
 <BootstrapTable onSort={this.onSort} .../>
 ```
 
-Features like pagination, local or remote data sorting, etc. can easily be added externally.
+### Row click handlers
+The table ```onRowClicked``` and ```onRowDoubleClicked``` properties take callback functions that are called when rows are clicked and double clicked. Note that if specified these are called in addition to the selection ```onChange``` events. Also the single click is always called before the double click. The single click callback is most useful if selection is ```none```, and the double click handler is most useful for double-click-to edit functionality. Both are called with the row clicked on:
+
+```
+onDoubleClicked(row) {
+   console.log('row double clicked: ' + row.id);
+   editRow(row);  
+}
+
+<BootstrapTable onRowDoubleClicked={this.onDoubleClicked} .../>
+```
