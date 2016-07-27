@@ -141,13 +141,12 @@ You can specify a renderer inside a column to handle custom rendering. The funct
 
 ```
 let columns = [
-  { name: item1, renderer: myRenderer},
-  { name: lastName },
-  { name: address }
+  { name: image, renderer: myRenderer},
+  ...
 ]
 
 function mRenderer(row) {
-  return <a href={row.link} className="bst-no-select">{row.title}</a>
+  return <a href={row.image.link} className="bst-no-select">{row.image.description}</a>
 }
 
 ```
