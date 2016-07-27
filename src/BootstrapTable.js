@@ -17,8 +17,8 @@ function noop() {}
 class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
-    bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect',
-                 'setColumnWidth', 'getColWidth', 'colClicked'], this);
+    bindmethods(['toggleSelectAll', 'rowClicked', 'setColumnWidth', 'getColWidth',
+                 'colClicked'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
@@ -60,7 +60,11 @@ class BootstrapTable extends Component {
   // Row clicked, update selection state
   //----------------------------------------------------------------------------
   rowClicked(e) {
+    // update the selection and clear the selectAll flag, if checked
     this.selection.rowClicked(e);
+    if (this.state.selectAll) {
+      this.setState({selectAll: false});
+    }  
   }
 
   colClicked(e) {
@@ -83,7 +87,7 @@ class BootstrapTable extends Component {
     // If the column is sortable, this changes the state internally of
     // the columnSort so force an update.
     if (this.columnSort.sort(key)) {
-      this.forceUpdate();      
+      this.forceUpdate();
     }
   }
 
