@@ -80,9 +80,11 @@ class BootstrapTable extends Component {
 
     log.debug('onColClick ' + key)
 
-    // This changes the columnSort icon. Force a re-render to dislay it.
-    this.columnSort.sort(key);
-    this.forceUpdate();
+    // If the column is sortable, this changes the state internally of
+    // the columnSort so force an update.
+    if (this.columnSort.sort(key)) {
+      this.forceUpdate();      
+    }
   }
 
   getColWidth(name) {

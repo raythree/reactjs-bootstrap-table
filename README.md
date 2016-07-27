@@ -151,3 +151,24 @@ function mRenderer(row) {
 
 ```
 Note that the renderer is passed the entire record (row), not just the data for that column.
+
+### Column sorting
+
+To make a column sortable, add a ```sort``` property to the column definition, with a value of ```true``` and add an ```onSort``` property to the table. When a sortable column is clicked, it will cycle through the states 'asc', 'desc' and 'none' (default order) and the column direction icon will be shown:
+
+```
+let columns = [
+  { name: lastName, sort: true, display: 'Last Name' },
+  ...
+]
+
+onSort(colName, dir) {
+  if (dir === 'asc') ...sort ascending
+  else if (dir === 'desc') ...sort descending
+  else ... default order
+}
+
+<BootstrapTable onSort={this.onSort} .../>
+```
+
+Features like pagination, local or remote data sorting, etc. can easily be added externally.

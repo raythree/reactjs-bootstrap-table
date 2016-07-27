@@ -46,15 +46,17 @@ module.exports = function (tableComponent) {
           icon = down;
           break;
       }
-      console.log('SORT: sort on col ' + colName + ' ' + next);
       columns[colName].state = next;
       columns[colName].icon = icon;
       callback(colName, next);
+      return true;
+    }
+    else {
+      return false;
     }
   };
 
   this.getIcon = function (colName) {
-    console.log('getIcon for ' + colName);
     const column = columns[colName];
     if (column) return column.icon;
     return none;
