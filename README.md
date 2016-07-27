@@ -96,7 +96,7 @@ TableContainer extends React.Component {
   }
 
   onChange(newSelection) {
-    this.setState(newSelection)
+    this.setState({selection: newSelection})
   }
 
   deselectAll() {
@@ -107,7 +107,8 @@ TableContainer extends React.Component {
     Object.keys(this.state.selected).forEach(k => {
       deleteDataByKey(k);
     });
-    this.setState({data: getData()});
+    // refresh data and clear selection
+    this.setState({data: getData(), selection: {}});
   }
 
   render() {
