@@ -161,8 +161,6 @@ class BootstrapTable extends Component {
       this.resizer = new Resizer(this, this.props.resize);
       this.resizer.addHandler();
     }
-    else {
-    }
   }
 
   componentWillUnmount() {
@@ -210,8 +208,10 @@ class BootstrapTable extends Component {
         );
       }.bind(this));
 
+      let tstyle = {};
+      if (this.props.resize) tstyle = {display: 'block'};
       headers =
-        <thead id={this.headerId} style={{display: 'block'}}>
+        <thead id={this.headerId} style={tstyle}>
           <tr style={{width: '100%', cursor: 'pointer'}}>
             { items }
           </tr>
@@ -274,7 +274,7 @@ class BootstrapTable extends Component {
         cursor = {cursor: 'pointer'};
       }
       row =
-        <tr style={{width: '100%', display: 'block'}} id={rowId} key={index} style={cursor} className={clz}
+        <tr style={{width: '100%'}} id={rowId} key={index} style={cursor} className={clz}
             onClick={this.rowClicked} onDoubleClick={this.rowDoubleClicked}>
         {items}
       </tr>
@@ -289,10 +289,13 @@ class BootstrapTable extends Component {
     if (this.props.disableSelectText) {
       ['WebkitUserSelect', 'MozUserSelect', 'msUserSelect'].forEach(key => { style[key] = 'none'; });
     }
+    let bstyle = {};
+    if (this.props.resize) bstyle = {height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'};
+
     let table =
       <table style={style}className="table table-hover table-bordered" id={this.id}>
         {headers}
-        <tbody style={{height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'}}>
+        <tbody style={bstyle}>
           {rows}
         </tbody>
       </table>
