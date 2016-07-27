@@ -177,9 +177,10 @@ onSort(colName, dir) {
   if (dir === 'asc') ...sort ascending
   else if (dir === 'desc') ...sort descending
   else ... default order
+  this.setState({data, sortedData});
 }
 
-<BootstrapTable onSort={this.onSort} .../>
+<BootstrapTable onSort={this.onSort} data={this.state.data} .../>
 ```
 
 ### Row click handlers
