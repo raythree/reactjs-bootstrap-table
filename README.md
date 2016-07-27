@@ -5,7 +5,7 @@ A React table component using Bootstrap. Supports single or multi-select, column
 **NOTE:** This requires Bootstrap (and Glyphicons) to be loaded. For example, if using Webpack:
 
 ```
-npm install Bootstrap
+npm install bootstrap
 ```
 
 Then inside your main app:
