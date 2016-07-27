@@ -4,6 +4,7 @@ import Glyph from './Glyph'
 import { bindmethods, getColumnWidths } from './util';
 import Resizer from './Resizer';
 import Selection from './Selection';
+import ColumnSort from './ColumnSort';
 
 Logger.configure({level: 'debug', 'dateFormat': null});
 const log = Logger.getLogger('BootstrapTable');
@@ -17,7 +18,7 @@ class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
     bindmethods(['toggleSelectAll', 'rowClicked', 'singleSelect', 'multiSelect',
-                 'setColumnWidth', 'getColWidth'], this);
+                 'setColumnWidth', 'getColWidth', 'colClicked'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
@@ -25,6 +26,7 @@ class BootstrapTable extends Component {
     this.headerId = this.id + '-header';
 
     this.selection = new Selection(this);
+    this.columnSort = new ColumnSort(this);
 
     this.select = 'none';
     if (this.props.select) {
@@ -59,6 +61,28 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
   rowClicked(e) {
     this.selection.rowClicked(e);
+  }
+
+  colClicked(e) {
+    let node = e.target, rid;
+    // find the parent row marked with id = bst-col-<key>
+    while (true) {
+      rid = node.id;
+      if (rid && rid.startsWith('bst-')) {
+        break;
+      }
+      else {
+        node = node.parentNode;
+      }
+    }
+    const parts = rid.split('-')
+    const key = parts[2];
+
+    log.debug('onColClick ' + key)
+
+    // This changes the columnSort icon. Force a re-render to dislay it.
+    this.columnSort.sort(key);
+    this.forceUpdate();
   }
 
   getColWidth(name) {
@@ -120,20 +144,23 @@ class BootstrapTable extends Component {
     //log.debug('generating headers');
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
-      this.props.columns.map((col) => {
+      this.props.columns.map(function(col) {
         let title = col.display || col.name;
         let glyph = '';
-        if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
+        //if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
+        glyph = this.columnSort.getIcon(col.name);
         items.push(
-          <th key={ix++} style={{width: this.getColWidth(col.name)}}>
+          <th key={ix++} id={'bst-col-' + col.name}
+              style={{width: this.getColWidth(col.name)}}
+              onClick={this.colClicked}>
             {title} {glyph}
           </th>
         );
-      });
+      }.bind(this));
 
       headers =
         <thead style={{display: 'block'}} id={this.headerId}>
-          <tr style={{width: '100%'}}>
+          <tr style={{width: '100%', cursor: 'pointer'}}>
             { items }
           </tr>
         </thead>
@@ -152,7 +179,7 @@ class BootstrapTable extends Component {
       if (!k) {
         if (this.selection.getType() != 'none') {
           throw new Error(missingKey);
-        }    
+        }
       }
 
       // Used to identify the row element that was clicked. If a child is clicked, navigate up each
