@@ -22,27 +22,13 @@ module.exports = function (tableComponent) {
     };
 
     this.rowClicked = function (e) {
-      let node = e.target, rid;
-      // ignore clicks if the clicked on element is marked as no-select
-      if (node.className && node.className.indexOf('bst-no-select') > -1) {
-        return;
-      }
-      if (type === 'none') return;
+      let row = tableComponent.getKeyAndIndex(e)
+      if (type === 'none') return row; // nothing to select, just return the row clicked
 
-      // find the parent row marked with id = bst-<key>-<index>
-      while (true) {
-        rid = node.id;
-        if (rid && rid.startsWith('bst-')) {
-          break;
-        }
-        else {
-          node = node.parentNode;
-        }
+      if (!row) {
+        return null;
       }
-
-      const parts = rid.split('-')
-      const key = parts[1];
-      const index = parseInt(parts[2]);
+      let { key, index } = row;
 
       if (tableComponent.props.select === 'multiple') {
         this.multiSelect(key, index, e.shiftKey);
@@ -50,6 +36,7 @@ module.exports = function (tableComponent) {
       else {
         this.singleSelect(key);
       }
+      return row;
     };
 
     this.singleSelect = function (key) {

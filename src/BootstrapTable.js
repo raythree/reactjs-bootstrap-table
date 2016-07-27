@@ -14,7 +14,7 @@ class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
     bindmethods(['toggleSelectAll', 'rowClicked', 'setColumnWidth', 'getColWidth',
-                 'colClicked'], this);
+                 'colClicked', 'rowDoubleClicked', 'getKeyAndIndex'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
@@ -55,11 +55,57 @@ class BootstrapTable extends Component {
   //----------------------------------------------------------------------------
   // Row clicked, update selection state
   //----------------------------------------------------------------------------
+
+  // find the row clicked and extract it's key and index
+  getKeyAndIndex(e) {
+    let node = e.target, rid;
+    // ignore clicks if the clicked on element is marked as no-select
+    if (node.className && node.className.indexOf('bst-no-select') > -1) {
+      return null;
+    }
+    // find the parent row marked with id = bst-<key>-<index>
+    while (true) {
+      rid = node.id;
+      if (rid && rid.startsWith('bst-')) {
+        break;
+      }
+      else {
+        node = node.parentNode;
+      }
+    }
+
+    const parts = rid.split('-')
+    const key = parts[1];
+    const index = parseInt(parts[2]);
+    return { key, index };
+  }
+
   rowClicked(e) {
-    // update the selection and clear the selectAll flag, if checked
-    this.selection.rowClicked(e);
+    // update the selection and clear the selectAll flag, if currently checked.
+    let keyAndIndex = this.selection.rowClicked(e);
+
     if (this.state.selectAll) {
       this.setState({selectAll: false});
+    }
+
+    // invoke row clicked handler
+    if (keyAndIndex) {
+      let { key, index } = keyAndIndex;
+      let row = this.props.data[index];
+      if (this.props.onRowClicked) {
+        this.props.onRowClicked(row);
+      }
+    }
+  }
+
+  rowDoubleClicked(e) {
+    let keyAndIndex = this.getKeyAndIndex(e)
+    if (keyAndIndex) {
+      let { key, index } = keyAndIndex;
+      let row = this.props.data[index];
+      if (this.props.onRowDoubleClicked) {
+        this.props.onRowDoubleClicked(row);
+      }
     }
   }
 
@@ -215,7 +261,9 @@ class BootstrapTable extends Component {
       if (this.select === 'single' || this.select === 'multiple') {
         cursor = {cursor: 'pointer'};
       }
-      row = <tr style={{width: '100%'}} id={rowId} key={index} style={cursor} className={clz} onClick={this.rowClicked}>
+      row =
+        <tr style={{width: '100%'}} id={rowId} key={index} style={cursor} className={clz}
+            onClick={this.rowClicked} onDoubleClick={this.rowDoubleClicked}>
         {items}
       </tr>
 
