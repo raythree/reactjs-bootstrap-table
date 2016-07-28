@@ -1,4 +1,4 @@
-module.exports = function (tableComponent, resizeObj) {
+module.exports = function (tableComponent, resizeObj, columnWidths) {
 
   function getSizeOfElements(ids) {
     if (!(ids && ids.length)) return 0;
@@ -36,18 +36,32 @@ module.exports = function (tableComponent, resizeObj) {
   function resize() {
     let h = window.innerHeight;
     let table = document.getElementById(tableComponent.id);
+    let tableBody = document.getElementById(tableComponent.bodyId);
     if (!table) {
       return;
     }
 
     let th = table.offsetHeight;
+    let tw = table.width;
     if (extra) {
       th = h - extra;
     }
     if (th < minSize) {
       th = minSize;
     }
-    tableComponent.setState({bodyHeight: '' + th + 'px'});
+    tableBody.style.height = '' + th + 'px';
+
+    tableComponent.props.columns.forEach(col => {
+      let width = columnWidths.getSize(tw, col.name) + extra;
+      let className = 'cbst-' + col.name;
+      console.log('COL ' + col.name + ' width = ' + width);
+
+      let cols = document.getElementsByClassName(className);
+      for (let i = 0; i < cols.length; i++) {
+        let col = cols[i];
+        col.style.width = '' + width + 'px';
+      }
+    });
   }
 
   this.addHandler = function () {

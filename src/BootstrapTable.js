@@ -4,6 +4,7 @@ import { bindmethods, getColumnWidths } from './util';
 import Resizer from './Resizer';
 import Selection from './Selection';
 import ColumnSort from './ColumnSort';
+import ColumnWidths from './ColumnWidths';
 
 function noop() {}
 
@@ -13,13 +14,14 @@ function noop() {}
 class BootstrapTable extends Component {
   constructor(props, context) {
     super(props, context);
-    bindmethods(['toggleSelectAll', 'rowClicked', 'setColumnWidth', 'getColWidth',
+    bindmethods(['toggleSelectAll', 'rowClicked', 'setColumnWidth',
                  'colClicked', 'rowDoubleClicked', 'getKeyAndIndex'], this);
 
     this.keyName = this.props.keyName || 'id';
     this.onChange = this.props.onChange || noop;
     this.id = this.props.id || 'bst-table1';
     this.headerId = this.id + '-header';
+    this.bodyId = this.id + '-body';
 
     this.selection = new Selection(this);
     this.columnSort = new ColumnSort(this);
@@ -43,7 +45,7 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
-    this.columnWidths = getColumnWidths(this.props.columns);
+    this.columnWidths = new ColumnWidths(this.props.columns);
 
     this.state = {
       selectAll: false,
@@ -131,11 +133,6 @@ class BootstrapTable extends Component {
     }
   }
 
-  getColWidth(name) {
-    let percent = this.columnWidths[name];
-    return '' + percent + '%';
-  }
-
   //----------------------------------------------------------------------------
   // Toggle select all state
   //----------------------------------------------------------------------------
@@ -158,7 +155,7 @@ class BootstrapTable extends Component {
 
   componentDidMount() {
     if (this.props.resize) {
-      this.resizer = new Resizer(this, this.props.resize);
+      this.resizer = new Resizer(this, this.props.resize, this.columnWidths);
       this.resizer.addHandler();
     }
   }
@@ -186,11 +183,6 @@ class BootstrapTable extends Component {
         </th>
       );
     }
-    else {
-      items.push(
-        <th key="check" style={{width: 0, padding: 0, borderColor: 'transparent'}} />
-      );
-    }
 
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
@@ -201,7 +193,8 @@ class BootstrapTable extends Component {
         glyph = this.columnSort.getIcon(col.name);
         items.push(
           <th key={ix++} id={'bst-col-' + col.name}
-              style={{width: this.getColWidth(col.name)}}
+              className={'cbst-' + col.name}
+              style={{width: this.columnWidths.getPercent(col.name)}}
               onClick={this.colClicked}>
             {title} {glyph}
           </th>
@@ -253,11 +246,6 @@ class BootstrapTable extends Component {
           <td key="check" style={{width: '1em'}}><Glyph icon={icon} /></td>
         );
       }
-      else {
-        items.push(
-          <td key="check" style={{width: 0, padding: 0, borderColor: 'transparent'}} />
-        );
-      }
 
       this.props.columns.forEach((col) => {
         let prop = col.name;
@@ -265,7 +253,12 @@ class BootstrapTable extends Component {
         if (col.renderer) {
           content = col.renderer(item);
         }
-        let td = <td key={ix++} style={{width: this.getColWidth(col.name)}}>{content}</td>
+        let td =
+          <td key={ix++}
+              className={'cbst-' + col.name}
+              style={{width: this.columnWidths.getPercent(col.name)}}>
+            {content}
+          </td>
         items.push(td);
       });
 
@@ -290,12 +283,20 @@ class BootstrapTable extends Component {
       ['WebkitUserSelect', 'MozUserSelect', 'msUserSelect'].forEach(key => { style[key] = 'none'; });
     }
     let bstyle = {};
-    if (this.props.resize) bstyle = {height: bodyHeight, width: '100%', overflow: 'auto', display: 'block'};
+    if (this.props.resize) {
+      bstyle = {
+        height: bodyHeight,
+        width: '100%',
+        overflow: 'auto',
+        display: 'block',
+        msOverflowStyle: '-ms-autohiding-scrollbar'
+      };
+    }
 
     let table =
       <table style={style}className="table table-hover table-bordered" id={this.id}>
         {headers}
-        <tbody style={bstyle}>
+        <tbody id={this.bodyId} style={bstyle}>
           {rows}
         </tbody>
       </table>
