@@ -38,9 +38,9 @@ By default no table headers are shown. If you want headers you need to set the `
 
 ```
 let columns = [
-  { name: firstName, display: 'First Name' },
-  { name: lastName, display: 'Last Name' },
-  { name: address, display: 'Address' }
+  { name: 'firstName', display: 'First Name' },
+  { name: 'lastName', display: 'Last Name' },
+  { name: 'address', display: 'Address' }
 ]
 
 <BootstrapTable columns={columns} data={data} headers={true} />

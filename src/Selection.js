@@ -9,7 +9,7 @@ module.exports = function (tableComponent) {
     function noop() {}
     let onChange = tableComponent.props.onChange || noop;
 
-    const select = tableComponent.props.select;
+    const select = tableComponent.props.select || 'none';
     if (select === 'multiple' || select === 'single' || select === 'none') {
       type = select;
     }
