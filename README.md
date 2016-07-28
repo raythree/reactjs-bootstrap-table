@@ -27,9 +27,9 @@ let data = [
    ...
 ]
 let columns = [
-  { name: firstName },
-  { name: lastName },
-  { name: address }
+  { name: 'firstName' },
+  { name: 'lastName' },
+  { name: 'address' }
 ]
 
 <BootstrapTable columns={columns} data={data} />
