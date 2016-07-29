@@ -66,12 +66,6 @@ By default all rows will be shown. If you want the table body to be a fixed size
 
 ### Dynamic resizing
 
-
-> **NOTE:** If this feature is used, {display: block} style is applied to the table head and body to allow for
-> scrolling of of the table body leaving the header in place. This looks fine on Chrome and Safari,
-> but in IE Edge it causes a slight misalignment of body columns with header columns (currently working on a dynamic resize of
-> via Javascript to fix this). This only happens if the ```resize``` property is used.
-
 If you want the table to fill the client area and dynamically resize when the browser window resizes, use the ```resize``` property. This property allows you to specify extra space to leave for other elements on the page. For example, if the other elements occupy 200 pixels and you want all elements plus the table to be visible in the client area, use:
 
 ```
