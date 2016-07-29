@@ -1,3 +1,6 @@
+### [1.0.3]
+* Got rid of JQuery, fixed column resize issues.
+
 ### [1.0.2]
 * Fixed mis-aligned column headers for IE. Dynamically resize columns and added ms-overflow-style to tbody.
 
