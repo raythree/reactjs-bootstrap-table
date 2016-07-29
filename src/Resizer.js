@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 module.exports = function (tableComponent, resizeObj, columnWidths) {
 
   function getSizeOfElements(ids) {
@@ -34,6 +36,10 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
   }
 
   function resize() {
+    let $table = $('table.scroll'),
+        $bodyCells = $table.find('tbody tr:first').children(),
+        colWidth;
+
     let h = window.innerHeight;
     let table = document.getElementById(tableComponent.id);
     let tableBody = document.getElementById(tableComponent.bodyId);
@@ -42,7 +48,37 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
     }
 
     let th = table.offsetHeight;
-    let tw = table.width;
+    let tw = tableBody.offsetWidth;
+    if (extra) {
+      th = h - extra;
+    }
+    if (th < minSize) {
+      th = minSize;
+    }
+    tableBody.style.height = '' + th + 'px';
+    //console.log("===> TBODY: " + '' + th + 'px');
+
+    colWidth = $bodyCells.map(function() {
+      return $(this).width();
+    }).get();
+
+    //console.log('col width: ' + colWidth);
+
+    // Set the width of thead columns
+    $table.find('thead tr').children().each(function(i, v) {
+      $(v).width(colWidth[i]);
+    });
+
+    /*
+    let h = window.innerHeight;
+    let table = document.getElementById(tableComponent.id);
+    let tableBody = document.getElementById(tableComponent.bodyId);
+    if (!table) {
+      return;
+    }
+
+    let th = table.offsetHeight;
+    let tw = tableBody.offsetWidth;
     if (extra) {
       th = h - extra;
     }
@@ -54,7 +90,6 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
     tableComponent.props.columns.forEach(col => {
       let width = columnWidths.getSize(tw, col.name) + extra;
       let className = 'cbst-' + col.name;
-      console.log('COL ' + col.name + ' width = ' + width);
 
       let cols = document.getElementsByClassName(className);
       for (let i = 0; i < cols.length; i++) {
@@ -62,7 +97,10 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
         col.style.width = '' + width + 'px';
       }
     });
+    */
   }
+
+  this.resize =  resize;
 
   this.addHandler = function () {
     window.addEventListener('resize', resize);

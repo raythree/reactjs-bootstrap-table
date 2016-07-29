@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Glyph from './Glyph'
-import { bindmethods, getColumnWidths } from './util';
+import { bindmethods } from './util';
 import Resizer from './Resizer';
 import Selection from './Selection';
 import ColumnSort from './ColumnSort';
@@ -45,7 +45,7 @@ class BootstrapTable extends Component {
       throw new Error('The columns property must be an array');
     }
 
-    this.columnWidths = new ColumnWidths(this.props.columns);
+    this.columnWidths = new ColumnWidths(this);
 
     this.state = {
       selectAll: false,
@@ -191,10 +191,11 @@ class BootstrapTable extends Component {
         let glyph = '';
         //if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
         glyph = this.columnSort.getIcon(col.name);
+        let thStyle = {width: this.columnWidths.getPercent(col.name)}
         items.push(
           <th key={ix++} id={'bst-col-' + col.name}
               className={'cbst-' + col.name}
-              style={{width: this.columnWidths.getPercent(col.name)}}
+              style={thStyle}
               onClick={this.colClicked}>
             {title} {glyph}
           </th>
@@ -253,10 +254,11 @@ class BootstrapTable extends Component {
         if (col.renderer) {
           content = col.renderer(item);
         }
+        let tdStyle = { width: this.columnWidths.getPercent(col.name) }
         let td =
           <td key={ix++}
               className={'cbst-' + col.name}
-              style={{width: this.columnWidths.getPercent(col.name)}}>
+              style={tdStyle}>
             {content}
           </td>
         items.push(td);
@@ -287,14 +289,14 @@ class BootstrapTable extends Component {
       bstyle = {
         height: bodyHeight,
         width: '100%',
-        overflow: 'auto',
+        overflowY: 'auto',
         display: 'block',
         msOverflowStyle: '-ms-autohiding-scrollbar'
       };
     }
 
     let table =
-      <table style={style}className="table table-hover table-bordered" id={this.id}>
+      <table style={style} className="table table-hover table-bordered scroll" id={this.id}>
         {headers}
         <tbody id={this.bodyId} style={bstyle}>
           {rows}

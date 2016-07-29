@@ -1,5 +1,6 @@
-module.exports = function ColumnWidths(columns) {
+module.exports = function ColumnWidths(tableComponent) {
 
+  let columns = tableComponent.props.columns;
   let columnWidths = {};
 
   let remainder = 100;
@@ -34,6 +35,22 @@ module.exports = function ColumnWidths(columns) {
     let pct = columnWidths[colName];
     let width = Math.floor(tableWidth * pct / 100);
     return width;
+  }
+
+  this.getWidth = function(colName) {
+    if (tableComponent.props.resize) {
+      let table = document.getElementById(tableComponent.id);
+      let tableBody = document.getElementById(tableComponent.bodyId);
+      if (!table) {
+        return;
+      }
+      let tw = table.offsetWidth;
+      tableBody.style.width = tw;
+      return this.getSize(tw, colName)
+    }
+    else {
+      return this.getPercent(colName);
+    }
   }
 
   this.getPercent = function (colName) {
