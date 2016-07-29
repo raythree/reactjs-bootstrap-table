@@ -50,6 +50,17 @@ let columns = [
 <BootstrapTable columns={columns} data={data} headers={true} />
 ```
 
+### Table properties
+* ```data``` (required) - Array of data rows to display.
+* ```columns``` (optional) - Column definitions. See below.
+* ```headers``` (optional) - Set to true to show column headers. See column properties below. Default false.
+* ```select``` (optional) - Enable selection. Values are single, multiple or none. (default none).
+* ```selected``` (optional) - Object containing keys of selected items with truthy values e.g. {key1: true, key2: true} (see Selection below).
+* ```resize``` (optional) - Display scrollable table body resizing to a specified height (see below). Default is to show all rows.
+* ```disableSelectText``` (optional) - Set to true to disable selection of text (default is false).
+* ```activeClass``` (optional) - className to apply to selected rows. Default is "active".
+
+
 ### Column properties
 
 These are the properties for objects in the columns array:
