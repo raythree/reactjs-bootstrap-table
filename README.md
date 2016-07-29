@@ -23,8 +23,8 @@ The data to be displayed is an array of objects and the ```columns``` property s
 import BootstrapTable from 'reactjs-bootstrap-table';
 
 let data = [
-   { id: 1, firstName: '...', lastName: '...', address: '...'},
-   { id: 2, firstName: '...', lastName: '...', address: '...'},
+   { id: 1, 'firstName': '...', lastName: '...', address: '...'},
+   { id: 2, 'firstName': '...', lastName: '...', address: '...'},
    ...
 ]
 let columns = [
