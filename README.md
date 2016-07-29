@@ -206,3 +206,110 @@ onDoubleClicked(row) {
 
 <BootstrapTable onRowDoubleClicked={this.onDoubleClicked} .../>
 ```
+
+### Code for the demo
+
+```Javascript
+import React from 'react';
+import BootstrapTable from 'reactjs-bootstrap-table';
+
+const data = [];
+for (let i = 1; i <= 500; i++) {
+  data.push({
+    id: i,
+    one: '' + i,
+    two: 'Column 2 line ' + i,
+    three: 'Column 3 line ' + i,
+    four: 'Column 4 line ' + i,
+    five: 'Column 5 line ' + i
+  });
+}
+
+class HomePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {selected: {}, message: '', lastClicked: null};
+
+    this.onChange = this.onChange.bind(this);
+    this.selectedCount = this.selectedCount.bind(this);
+    this.buttonDisabled = this.buttonDisabled.bind(this);
+    this.deselect = this.deselect.bind(this);
+    this.renderColumn = this.renderColumn.bind(this);
+    this.rowClicked = this.rowClicked.bind(this);
+
+    this.columns = [
+      { name: 'one', display: 'ID', width: 1 },
+      { name: 'two', display: 'Column Two' },
+      { name: 'three', display: 'Column Three' },
+      { name: 'four', display: 'Column Four' },
+      { name: 'five', display: 'Column Five', renderer: this.renderColumn }
+    ];
+  }
+
+  onChange(newSelection) {
+    this.setState({selected: newSelection});
+  }
+
+  selectedCount() {
+    return Object.keys(this.state.selected).length;
+  }
+
+  deselect() {
+    this.setState({selected: {}});
+  }
+
+  buttonDisabled() {
+    return !this.selectedCount();
+  }
+
+  renderColumn(row) {
+    let link =
+      <a className="bst-no-select"
+          onClick={this.rowClicked.bind(null, row.id)}>
+        {row.five} Click Me!
+      </a>
+    return link;
+  }
+
+  rowClicked(id) {
+    this.setState({message: 'You clicked item ' + id});
+    setTimeout(() => {
+      this.setState({message: ''});
+    }, 1000);
+  }
+
+  render() {
+    return (
+      <div>
+        <h1 id="header">reactjs-bootstrap-table Example</h1>
+        <div>
+          <button className="btn btn-primary"
+              style={{marginBottom: '1em', marginRight: '1em'}}
+              onClick={this.deselect}
+              disabled={this.buttonDisabled()}>
+            Deselect All
+          </button>
+
+          <span style={{color: 'green', fontWeight: 'bold'}}> { this.state.message }</span>
+
+          <BootstrapTable
+            headers={true}
+            select="multiple"
+            activeClass="info"
+            disableSelectText={true}
+            selected={this.state.selected}
+            onChange={this.onChange}
+            resize={{extra: 80, elements:['header', 'footer'], minSize: 200}}
+            columns={this.columns} data={data} />
+        </div>
+        <div id="footer" className="well" style={{marginTop: '-19px', color: 'green'}}>
+          Selected: {this.selectedCount()}
+        </div>
+      </div>
+    );
+  }
+}
+
+export default HomePage;
+
+```
