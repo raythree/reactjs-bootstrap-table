@@ -217,6 +217,8 @@ onDoubleClicked(row) {
 
 ### Code for the [demo](http://bst.ray3.io)
 
+Full code [here](https://github.com/raythree/react-bootstrap-table-demo/blob/master/src/components/HomePage.js), modified from [react-slingshot](https://github.com/coryhouse/react-slingshot).
+
 ```Javascript
 import React from 'react';
 import BootstrapTable from 'reactjs-bootstrap-table';
