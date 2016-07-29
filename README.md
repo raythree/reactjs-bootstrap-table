@@ -35,6 +35,9 @@ let columns = [
 
 <BootstrapTable columns={columns} data={data} />
 ```
+
+If you do not provide the ```columns``` property the keys from the first data row are used for column ```name```s.
+
 By default no table headers are shown. If you want headers you need to set the ```headers``` property to ```true``` and should add a ```display``` property to each column. If you don't add the ```display``` property the ```name``` field will be used (not generally what you want):
 
 ```

@@ -1,3 +1,6 @@
+### [1.0.4]
+Fix for column renderer returning boolean. Made columns optional, using data property names by default.
+
 ### [1.0.3]
 * Got rid of JQuery, fixed column resize issues.
 

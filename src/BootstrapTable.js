@@ -23,9 +23,6 @@ class BootstrapTable extends Component {
     this.headerId = this.id + '-header';
     this.bodyId = this.id + '-body';
 
-    this.selection = new Selection(this);
-    this.columnSort = new ColumnSort(this);
-
     this.select = 'none';
     if (this.props.select) {
       if (this.props.select === 'single' ||
@@ -38,13 +35,25 @@ class BootstrapTable extends Component {
       }
     }
 
+    this.columns = [];
+
     if (!this.props.columns) {
-      throw new Error('The required columns property is missing');
+      let data = this.props.data || [];
+      if (data.length) {
+        Object.keys(data[0]).forEach(key => {
+          this.columns.push({name: key});
+        });
+      }
     }
-    if (typeof this.props.columns.length === 'undefined') {
-      throw new Error('The columns property must be an array');
+    else {
+      if (typeof this.props.columns.length === 'undefined') {
+        throw new Error('The columns property must be an array');
+      }
+      this.columns = this.props.columns;
     }
 
+    this.selection = new Selection(this);
+    this.columnSort = new ColumnSort(this);
     this.columnWidths = new ColumnWidths(this);
 
     this.state = {
@@ -186,7 +195,7 @@ class BootstrapTable extends Component {
 
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
-      this.props.columns.map(function(col) {
+      this.columns.map(function(col) {
         let title = col.display || col.name;
         let glyph = '';
         //if (col.sort) glyph = <Glyph icon="triangle-bottom"/>
@@ -248,13 +257,13 @@ class BootstrapTable extends Component {
         );
       }
 
-      this.props.columns.forEach((col) => {
+      this.columns.forEach((col) => {
         let prop = col.name;
         let content = item[prop];
-        if (col.renderer) {          
+        if (col.renderer) {
           content = col.renderer(item);
-          //for cases where content is true or false.                    
-          content = typeof content === 'boolean' ? (''+content) : content;
+          //for cases where content is true or false.
+          content = (typeof content === 'boolean') ? ('' + content) : content;
         }
         let tdStyle = { width: this.columnWidths.getPercent(col.name) }
         let td =

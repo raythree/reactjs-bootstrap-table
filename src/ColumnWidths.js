@@ -1,6 +1,6 @@
 module.exports = function ColumnWidths(tableComponent) {
 
-  let columns = tableComponent.props.columns;
+  let columns = tableComponent.columns;
   let columnWidths = {};
 
   let remainder = 100;

@@ -15,7 +15,7 @@ module.exports = function (tableComponent) {
   // current column state has name: 'asc', 'desc', or 'default' and icon.
   const columns = {};
 
-  tableComponent.props.columns.forEach(col => {
+  tableComponent.columns.forEach(col => {
     if (col.sort) {
       // initial sort state
       columns[col.name] = {
