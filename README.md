@@ -215,7 +215,7 @@ onDoubleClicked(row) {
 <BootstrapTable onRowDoubleClicked={this.onDoubleClicked} .../>
 ```
 
-### Code for the demo
+### Code for the [demo](http://bst.ray3.io)
 
 ```Javascript
 import React from 'react';
