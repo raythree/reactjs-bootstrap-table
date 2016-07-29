@@ -55,7 +55,10 @@ module.exports = function (tableComponent) {
     this.multiSelect = function (key, index, shiftKey) {
       let current = tableComponent.props.selected || {};
       let data = tableComponent.props.data || [];
-      let selected = Object.assign({}, current);
+      let selected = {};
+      Object.keys(current).forEach(prop => {
+        selected[prop] = current[prop];
+      })
 
       if (shiftKey && tableComponent.state.anchor !== null) {
         let upper = null, lower = null;

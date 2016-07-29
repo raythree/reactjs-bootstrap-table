@@ -2,6 +2,7 @@
 
 A React table component using Bootstrap. Supports single or multi-select, column sorting, and dynamic resizing. Features like pagination, local or remote data sorting, etc. can easily be added externally.
 
+[A demo is here](http://bst.ray3.io)
 
 **NOTE:** This requires Bootstrap (and Glyphicons) to be loaded. For example, if using Webpack:
 
