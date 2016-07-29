@@ -68,7 +68,7 @@ class BootstrapTable extends Component {
     // find the parent row marked with id = bst-<key>-<index>
     while (true) {
       rid = node.id;
-      if (rid && rid.startsWith('bst-')) {
+      if (rid && rid.indexOf('bst-') === 0) {
         break;
       }
       else {
@@ -116,7 +116,7 @@ class BootstrapTable extends Component {
     // find the parent row marked with id = bst-col-<key>
     while (true) {
       rid = node.id;
-      if (rid && rid.startsWith('bst-')) {
+      if (rid && rid.indexOf('bst-') === 0) {
         break;
       }
       else {

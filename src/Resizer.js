@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 module.exports = function (tableComponent, resizeObj, columnWidths) {
 
   function getSizeOfElements(ids) {
@@ -12,6 +10,25 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
       }
     });
     return total;
+  }
+
+  function setHeaderWidths() {
+    let widths = [];
+    let tbody = document.getElementById(tableComponent.bodyId);
+    let thead = document.getElementById(tableComponent.headerId);
+    if (!(tbody && thead)) return;
+    if (!(thead.rows.length && tbody.rows.length)) return;
+
+    let cellWidths = [];
+    for (let i = 0; i < tbody.rows[0].cells.length; i++) {
+      let width = tbody.rows[0].cells[i].offsetWidth;
+      cellWidths.push(width);
+    }
+    for (let i = 0; i < thead.rows[0].cells.length; i++) {
+      let width = cellWidths[i];
+      let th = thead.rows[0].cells[i];
+      th.style.width = '' + width + 'px';
+    }
   }
 
   var id = tableComponent.id;
@@ -36,19 +53,17 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
   }
 
   function resize() {
-    let $table = $('table.scroll'),
-        $bodyCells = $table.find('tbody tr:first').children(),
-        colWidth;
-
     let h = window.innerHeight;
     let table = document.getElementById(tableComponent.id);
     let tableBody = document.getElementById(tableComponent.bodyId);
+    let tableHeader = document.getElementById(tableComponent.headerId);
+
     if (!table) {
       return;
     }
 
     let th = table.offsetHeight;
-    let tw = tableBody.offsetWidth;
+    let tw = table.offsetWidth;
     if (extra) {
       th = h - extra;
     }
@@ -56,51 +71,8 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
       th = minSize;
     }
     tableBody.style.height = '' + th + 'px';
-    //console.log("===> TBODY: " + '' + th + 'px');
-
-    colWidth = $bodyCells.map(function() {
-      return $(this).width();
-    }).get();
-
-    //console.log('col width: ' + colWidth);
-
-    // Set the width of thead columns
-    $table.find('thead tr').children().each(function(i, v) {
-      $(v).width(colWidth[i]);
-    });
-
-    /*
-    let h = window.innerHeight;
-    let table = document.getElementById(tableComponent.id);
-    let tableBody = document.getElementById(tableComponent.bodyId);
-    if (!table) {
-      return;
-    }
-
-    let th = table.offsetHeight;
-    let tw = tableBody.offsetWidth;
-    if (extra) {
-      th = h - extra;
-    }
-    if (th < minSize) {
-      th = minSize;
-    }
-    tableBody.style.height = '' + th + 'px';
-
-    tableComponent.props.columns.forEach(col => {
-      let width = columnWidths.getSize(tw, col.name) + extra;
-      let className = 'cbst-' + col.name;
-
-      let cols = document.getElementsByClassName(className);
-      for (let i = 0; i < cols.length; i++) {
-        let col = cols[i];
-        col.style.width = '' + width + 'px';
-      }
-    });
-    */
+    setHeaderWidths();
   }
-
-  this.resize =  resize;
 
   this.addHandler = function () {
     window.addEventListener('resize', resize);
