@@ -251,8 +251,10 @@ class BootstrapTable extends Component {
       this.props.columns.forEach((col) => {
         let prop = col.name;
         let content = item[prop];
-        if (col.renderer) {
+        if (col.renderer) {          
           content = col.renderer(item);
+          //for cases where content is true or false.                    
+          content = typeof content === 'boolean' ? (''+content) : content;
         }
         let tdStyle = { width: this.columnWidths.getPercent(col.name) }
         let td =
