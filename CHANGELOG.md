@@ -1,3 +1,6 @@
+### [1.0.5]
+* When selection is single or none, added 1 pixel invisible column to force columns to fill row.
+
 ### [1.0.4]
 Fix for column renderer returning boolean. Made columns optional, using data property names by default.
 

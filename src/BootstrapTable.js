@@ -192,6 +192,11 @@ class BootstrapTable extends Component {
         </th>
       );
     }
+    else {
+      items.push(
+        <th key="check" style={{width: '1px', borderColor: 'transparent', padding: 0}} />
+      );
+    }
 
     if (this.props.headers) {
       let ix = 1; // give header items a key to avoid react warning
@@ -254,6 +259,11 @@ class BootstrapTable extends Component {
       if (this.select === 'multiple') {
         items.push(
           <td key="check" style={{width: '1em'}}><Glyph icon={icon} /></td>
+        );
+      }
+      else {
+        items.push(
+          <th key="check" style={{width: '1px', borderColor: 'transparent', padding: 0}} />
         );
       }
 
