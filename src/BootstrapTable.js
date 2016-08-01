@@ -174,6 +174,9 @@ class BootstrapTable extends Component {
       this.select = newProps.select;
       this.selection = new Selection(this);
     }
+    if (newProps.data && newProps.data.length === 0) {
+      this.setState({selectAll: false});
+    }
   }
 
   componentWillUnmount() {
