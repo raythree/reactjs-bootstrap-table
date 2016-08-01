@@ -316,8 +316,9 @@ class BootstrapTable extends Component {
       };
     }
 
+    let tableClass = this.props.tableClass || 'table table-hover table-bordered';
     let table =
-      <table style={style} className="table table-hover table-bordered scroll" id={this.id}>
+      <table style={style} className={tableClass} id={this.id}>
         {headers}
         <tbody id={this.bodyId} style={bstyle}>
           {rows}
