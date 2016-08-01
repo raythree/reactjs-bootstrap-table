@@ -1,3 +1,6 @@
+### [1.0.6]
+* When selection type is changed (new props) update the selection handling to reflect the change.
+
 ### [1.0.5]
 * When selection is single or none, added 1 pixel invisible column to force columns to fill row.
 

@@ -169,6 +169,13 @@ class BootstrapTable extends Component {
     }
   }
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.select && newProps.select !== this.select) {
+      this.select = newProps.select;
+      this.selection = new Selection(this);
+    }
+  }
+
   componentWillUnmount() {
     if (this.resizer) this.resizer.removeHandler();
   }
