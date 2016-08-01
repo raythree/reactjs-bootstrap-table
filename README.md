@@ -4,8 +4,7 @@ A React table component using Bootstrap. Supports single or multi-select, column
 
 [A demo is here](http://bst.ray3.io)
 
-[Code for demo here](https://github.com/raythree/react-bootstrap-table-demo/blob/master/src/components/HomePage.js)
-
+[Code for demo here](https://github.com/raythree/react-bootstrap-table-demo)
 
 **NOTE:** This requires Bootstrap (and Glyphicons) to be loaded. For example, if using Webpack:
 
