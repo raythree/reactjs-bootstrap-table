@@ -2,7 +2,7 @@
 
 A React table component using Bootstrap. Supports single or multi-select, column sorting, and dynamic resizing. Features like pagination, local or remote data sorting, etc. can easily be added externally.
 
-[A demo is here](http://bst.ray3.io)
+[A demo is here](http://demo.ray3.io/bootstrap-table/)
 
 [Code for demo here](https://github.com/raythree/reactjs-bootstrap-table-demo)
 
