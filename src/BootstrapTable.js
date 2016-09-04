@@ -18,7 +18,7 @@ class BootstrapTable extends Component {
                  'colClicked', 'rowDoubleClicked', 'getKeyAndIndex'], this);
 
     this.keyName = this.props.keyName || 'id';
-    this. = this.props.onChange || noop;
+    this.onChange = this.props.onChange || noop;
     this.id = this.props.id || 'bst-table1';
     this.headerId = this.id + '-header';
     this.bodyId = this.id + '-body';
@@ -176,8 +176,8 @@ class BootstrapTable extends Component {
       this.select = newProps.select;
       this.selection = new Selection(this);
     }
-    if (newProps.data && newProps.data.length === 0) {
-      this.setState({selectAll: false});
+    if (this.newProps.data && this.newProps.data.length === 0) {
+
     }
   }
 
