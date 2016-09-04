@@ -48,6 +48,19 @@ module.exports = function (tableComponent) {
       }
       columns[colName].state = next;
       columns[colName].icon = icon;
+
+      // reset any other sortable columns
+      tableComponent.columns.forEach(col => {
+        if (col.sort) {
+          if (col.name !== colName) {
+            columns[col.name] = {
+              state: 'none',
+              icon: none
+            }
+          }
+        }
+      });
+
       callback(colName, next);
       return true;
     }

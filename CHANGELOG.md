@@ -1,3 +1,9 @@
+### [1.0.10]
+* Fixed to reset other column sort states when a current column sort state changes.
+
+### [1.0.9]
+* Fixed bug added at commit time.
+
 ### [1.0.7]
 * Fixed bug in selection for the case where user defined keys contain dashes.
 
