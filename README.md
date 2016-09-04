@@ -149,7 +149,7 @@ TableContainer extends React.Component {
       <div>
         <button onClick={this.onDelete}>Delete Selected</button>
         <button onClick={this.onDeselectAll}>Deselected All</button>
-        <BootstrapTable selected={this.state.selected} data={this.state.data}/>
+        <BootstrapTable selected={this.state.selection} data={this.state.data}/>
       </div>
     );  
   }  

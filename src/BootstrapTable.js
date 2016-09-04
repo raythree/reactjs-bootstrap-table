@@ -18,7 +18,7 @@ class BootstrapTable extends Component {
                  'colClicked', 'rowDoubleClicked', 'getKeyAndIndex'], this);
 
     this.keyName = this.props.keyName || 'id';
-    this.onChange = this.props.onChange || noop;
+    this. = this.props.onChange || noop;
     this.id = this.props.id || 'bst-table1';
     this.headerId = this.id + '-header';
     this.bodyId = this.id + '-body';
@@ -84,10 +84,12 @@ class BootstrapTable extends Component {
         node = node.parentNode;
       }
     }
-
+    // user defined keys may have dashes, everything between "bst" and "index"
+    // are part of the original key.
     const parts = rid.split('-')
-    const key = parts[1];
-    const index = parseInt(parts[2]);
+    const index = parts[parts.length-1];
+    const keyParts = parts.slice(1, parts.length - 1);
+    const key = keyParts.join('-');
     return { key, index };
   }
 

@@ -1,3 +1,6 @@
+### [1.0.7]
+* Fixed bug in selection for the case where user defined keys contain dashes.
+
 ### [1.0.6]
 * When selection type is changed (new props) update the selection handling to reflect the change.
 
