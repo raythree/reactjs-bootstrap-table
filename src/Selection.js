@@ -34,12 +34,13 @@ module.exports = function (tableComponent) {
         this.multiSelect(key, index, e.shiftKey);
       }
       else {
-        this.singleSelect(key);
+        this.singleSelect(key, index);
       }
       return row;
     };
 
-    this.singleSelect = function (key) {
+    this.singleSelect = function (key, index) {
+      let data = tableComponent.props.data || [];
       let current = tableComponent.props.selected || {};
       let selected = {};
 
@@ -47,7 +48,7 @@ module.exports = function (tableComponent) {
         onChange({}); // already selected, deselect it
       }
       else {
-        selected[key] = true;
+        selected[key] = data[index];
         onChange(selected);
       }
     };
@@ -72,13 +73,13 @@ module.exports = function (tableComponent) {
         }
         else {
           tableComponent.setState({anchor: index});
-          selected[key] = true;
+          selected[key] = data[index];
         }
         if (lower !== null) {
           selected = {};
           for (let i = lower; i <= upper; i++) {
             let item = data[i];
-            selected[item[tableComponent.keyName]] = true;
+            selected[item[tableComponent.keyName]] = item;
           }
         }
       }
@@ -87,7 +88,7 @@ module.exports = function (tableComponent) {
           delete selected[key];
         }
         else {
-          selected[key] = true;
+          selected[key] = data[index];
         }
         tableComponent.setState({anchor: index})
       }

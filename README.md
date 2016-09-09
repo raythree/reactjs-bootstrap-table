@@ -116,7 +116,7 @@ If the data is empty, by default nothing will be rendered. If you would like to 
 ### Selection
 The default ```select``` property is ```none```, but can be set to ```single``` or ```multiple``` to enable selection. The default className for selected rows is "active" but you can specify the ```activeClass``` property to change it to any other class, either your own or a bootstrap class like "info".
 
-Selection is treated like a "controlled property" to allow the table container to programmatically control the selection. Each time the selection changes the ```onChange``` handler is called with the new selection. The selection is an object with keys being the IDs of the selected rows or an empty object for no items selected:
+Selection is treated like a "controlled property" to allow the table container to programmatically control the selection. Each time the selection changes the ```onChange``` handler is called with the new selection. The selection is an object with keys being the IDs of the selected rows and the value of the row data, or an empty object for no items selected:
 
 ```
 TableContainer extends React.Component {

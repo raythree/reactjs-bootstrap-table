@@ -153,7 +153,7 @@ class BootstrapTable extends Component {
 
     if (all) {
       data.forEach(function (item) {
-        selected[item[this.keyName]] = true;
+        selected[item[this.keyName]] = item;
       }.bind(this));
     }
     this.setState( {selectAll: all} );
