@@ -1,5 +1,11 @@
 module.exports = function (tableComponent, resizeObj, columnWidths) {
 
+  let initialLoad = true;
+
+  function debug(msg) {
+    //console.log('BootstrapTable: ' + msg); 
+  }
+
   function getSizeOfElements(ids) {
     if (!(ids && ids.length)) return 0;
     let total = 0;
@@ -58,19 +64,36 @@ module.exports = function (tableComponent, resizeObj, columnWidths) {
     let tableBody = document.getElementById(tableComponent.bodyId);
     let tableHeader = document.getElementById(tableComponent.headerId);
 
+    debug('Resize -> Window HEIGHT: ' + h);
+
     if (!table) {
       return;
     }
 
     let th = table.offsetHeight;
+    let thh = tableHeader.offsetHeight;
+    let tbh = tableBody.offsetHeight;
+
     let tw = table.offsetWidth;
+
+    debug('Resize -> Table  offsetHeight: ' + th);
+    debug('Resize -> Header offsetHeight: ' + thh);
+    debug('Resize -> Body   offsetHeight: ' + tbh);
+
     if (extra) {
       th = h - extra;
     }
     if (th < minSize) {
       th = minSize;
     }
+
+    if (!initialLoad) {
+      debug("INITAL LOAD adjustment");
+      initialLoad = false;
+      th = th + thh;
+    }
     tableBody.style.height = '' + th + 'px';
+    debug('Resize -> Set Table Height to ' + th);
     setHeaderWidths();
   }
 

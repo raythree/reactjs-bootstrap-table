@@ -8,6 +8,21 @@ import ColumnWidths from './ColumnWidths';
 
 function noop() {}
 
+function forceResize() {
+  setTimeout(function () {
+    if (document.createEvent) { // W3C
+      var ev = document.createEvent('Event');
+      ev.initEvent('resize', true, true);
+      window.dispatchEvent(ev);
+    }
+    else { // IE
+      var element=document.documentElement;
+      var event=document.createEventObject();
+      element.fireEvent("onresize",event);
+    }
+  }, 100);
+}
+
 //----------------------------------------------------------------------------
 // A bootstrap table with single or multiple select.
 //----------------------------------------------------------------------------
@@ -22,6 +37,7 @@ class BootstrapTable extends Component {
     this.id = this.props.id || 'bst-table1';
     this.headerId = this.id + '-header';
     this.bodyId = this.id + '-body';
+    this.lastScrollTop = 0;
 
     this.select = 'none';
     if (this.props.select) {
@@ -160,6 +176,9 @@ class BootstrapTable extends Component {
     this.onChange(selected);
   }
 
+  onScroll(e) {
+  }
+
   //----------------------------------------------------------------------------
   // Lifecycle
   //----------------------------------------------------------------------------
@@ -168,6 +187,7 @@ class BootstrapTable extends Component {
     if (this.props.resize) {
       this.resizer = new Resizer(this, this.props.resize, this.columnWidths);
       this.resizer.addHandler();
+      forceResize();
     }
   }
 
@@ -179,6 +199,7 @@ class BootstrapTable extends Component {
     if (newProps.data && newProps.data.length === 0) {
       this.setState({selectAll: false});
     }
+    if (this.props.resize) forceResize();
   }
 
   componentWillUnmount() {
@@ -329,13 +350,14 @@ class BootstrapTable extends Component {
     }
 
     let tableClass = this.props.tableClass || 'table table-hover table-bordered';
-    let table =
+    let table = (
       <table style={style} className={tableClass} id={this.id}>
         {headers}
-        <tbody id={this.bodyId} style={bstyle}>
+        <tbody id={this.bodyId} style={bstyle} onScroll={this.onScroll.bind(this)}>
           {rows}
         </tbody>
       </table>
+    );
     return table;
   }
 }

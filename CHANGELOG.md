@@ -1,3 +1,9 @@
+### [1.0.12]
+* Added a force resize after initial display and on each property change 
+
+### [1.0.11]
+* Changed selection such that each key property has the value set to the corresponding data object rather than just true.
+
 ### [1.0.10]
 * Fixed to reset other column sort states when a current column sort state changes.
 
